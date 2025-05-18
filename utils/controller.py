@@ -23,3 +23,21 @@ def update_user(users_data: list) -> None:
             user['location'] = input('podaj nową lokalizację użytkownika: ')
             user['posts'] = input('podaj liczbę postów: ')
 
+def get_coordinates(city_name:str)->list:
+    import requests
+    from bs4 import BeautifulSoup
+    url=f"https://pl.wikipedia.org/wiki/{city_name}"
+    response=requests.get(url).text
+    response_html=BeautifulSoup(response,"html.parser")
+    longitude=float(response_html.select(".longitude")[1].text.replace(",","."))
+    latitude=float(response_html.select(".latitude")[1].text.replace(",","."))
+    print(longitude)
+    print(latitude)
+    return [latitude, longitude]
+
+def get_map(users_data:list)->None:
+    import folium
+    m = folium.Map(location=(52.23, 21.0), zoom_start=6)
+    for user in users_data:
+        folium.Marker(location=get_coordinates(user['location']),popup='<img src="https://geoforum.pl/upload3/news_pl/picture/328_geodeta_artykul6.jpg"/>').add_to(m)
+    m.save("index.html")
