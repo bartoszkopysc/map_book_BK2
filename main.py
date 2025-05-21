@@ -2,6 +2,91 @@ from tkinter import *
 
 import tkintermapview
 
+
+users:list = []
+
+
+
+def add_user():
+    zmienna_imie=entry_name.get()
+    zmienna_nazwisko=entry_surname.get()
+    zmienna_miejscowosc=entry_location.get()
+    zmienna_post=entry_post.get()
+    user={'name':zmienna_imie,'surname':zmienna_nazwisko,'location':zmienna_miejscowosc,'post':zmienna_post}
+    users.append(user)
+
+    entry_name.delete(0,END)
+    entry_surname.delete(0,END)
+    entry_location.delete(0,END)
+    entry_post.delete(0,END)
+
+    entry_name.focus()
+
+    show_users()
+
+
+
+def show_users():
+    listbox_lista_obiektow.delete(0,END)
+    for idx,user in enumerate(users):
+        listbox_lista_obiektow.insert(idx,f'{idx+1}{user['name']}{user["surname"]}')
+
+def remove_user():
+    i=listbox_lista_obiektow.index(ACTIVE)
+    users.pop(i)
+    show_users()
+
+def edit_user():
+    i=listbox_lista_obiektow.index(ACTIVE)
+    name=users[i]['name']
+    surname=users[i]['surname']
+    location=users[i]['location']
+    post=users[i]['post']
+
+    entry_name.insert(0,name)
+    entry_surname.insert(0,surname)
+    entry_location.insert(0,location)
+    entry_post.insert(0,post)
+
+    button_dodaj_obiekt.config(text='Zapisz', command=lambda: update_user)
+
+def update_user(i):
+    new_name=entry_name.get()
+    new_surname=entry_surname.get()
+    new_location=entry_location.get()
+    new_post=entry_post.get()
+
+    users[i]['name']=new_name
+    users[i]['surname']=new_surname
+    users[i]['location']=new_location
+    users[i]['post']=new_post
+
+    entry_name.delete(0,END)
+    entry_surname.delete(0,END)
+    entry_location.delete(0,END)
+    entry_post.delete(0,END)
+    entry_name.focus()
+
+    button_dodaj_obiekt.config(text='Dodaj obiekt', command=add_user)
+    show_users()
+
+
+
+def show_user_details():
+    i=listbox_lista_obiektow.index(ACTIVE)
+    name=users[i]['name']
+    surname=users[i]['surname']
+    location=users[i]['location']
+    post=users[i]['post']
+    label_szczegoly_name_wartosc.config(text=name)
+    label_szczegoly_surname_wartosc.config(text=surname)
+    label_szczegoly_location_wartosc.config(text=location)
+    label_szczegoly_posts_wartosc.config(text=post)
+
+
+
+
+
 root = Tk()
 root.geometry("1200x760")
 root.title('Map Book BK2')
@@ -22,11 +107,11 @@ label_lista_obiektow=Label(ramka_lista_obiektow, text="Lista użytkowników")
 label_lista_obiektow.grid(row=0, column=0, columnspan=3)
 listbox_lista_obiektow=Listbox(ramka_lista_obiektow, width=50, height=10)
 listbox_lista_obiektow.grid(row=1, column=0, columnspan=3)
-button_pokaz_szczegoly_obiektu=Button(ramka_lista_obiektow, text='Pokaż szczegóły')
+button_pokaz_szczegoly_obiektu=Button(ramka_lista_obiektow, text='Pokaż szczegóły', command=show_user_details)
 button_pokaz_szczegoly_obiektu.grid(row=2, column=0)
-button_usun_obiekt=Button(ramka_lista_obiektow, text='Usuń obiekt')
+button_usun_obiekt=Button(ramka_lista_obiektow, text='Usuń obiekt', command=remove_user)
 button_usun_obiekt.grid(row=2, column=1)
-button_edytuj_obiekt=Button(ramka_lista_obiektow, text='Edytuj obiekt')
+button_edytuj_obiekt=Button(ramka_lista_obiektow, text='Edytuj obiekt', command=edit_user)
 button_edytuj_obiekt.grid(row=2, column=2)
 
 # ramka_formularz
@@ -50,8 +135,8 @@ entry_location.grid(row=3, column=1)
 entry_post=Entry(ramka_formularz)
 entry_post.grid(row=4, column=1)
 
-button_doda_obiekt=Button(ramka_formularz, text='Dodaj obiekt')
-button_doda_obiekt.grid(row=5, column=0, columnspan=2)
+button_dodaj_obiekt=Button(ramka_formularz, text='Dodaj obiekt', command=add_user)
+button_dodaj_obiekt.grid(row=5, column=0, columnspan=2)
 
 #ramka_szczegoly_obiektow
 label_szczegoly_obiektow=Label(ramka_szczegoly_obiektow, text="Szczegoly obiektu: ")
@@ -78,7 +163,6 @@ map_widget = tkintermapview.TkinterMapView(ramka_mapa, width=1200, height=500, c
 map_widget.grid(row=0, column=0, columnspan=2)
 map_widget.set_position(52.23,21.0)
 map_widget.set_zoom(6)
-
 
 
 
